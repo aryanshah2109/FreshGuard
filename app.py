@@ -18,7 +18,7 @@ if gpus:
 # -------------------------------
 @st.cache_resource(show_spinner=False)
 def load_freshguard_model():
-    model_path = r"D:\Projects\FreshGuard\models\freshguard_model.h5"
+    model_path = r"D:\Projects\FreshGuard\models\freshguard_model.keras"  # .keras file
     try:
         model = load_model(model_path)
         return model
@@ -74,7 +74,7 @@ st.markdown("Upload an image of a fruit or vegetable to check its **freshness le
 uploaded_file = st.file_uploader("📂 Upload an image...", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image.resize((300, 300)), caption="Uploaded Image", use_column_width=False)
+    st.image(image.resize((300, 300)), caption="Uploaded Image", use_container_width=False)
     
     with st.spinner("⏳ Analyzing..."):
         label, confidence = predict(image)
