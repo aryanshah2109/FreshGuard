@@ -1,40 +1,63 @@
 import streamlit as st
 import numpy as np
-import pickle
 from PIL import Image
-from keras.models import load_model
-from keras.preprocessing import image as keras_image
+from tensorflow.keras.models import load_model
+import pickle
+import tensorflow as tf
+
+# -------------------------------
+# 0. GPU setup (optional)
+# -------------------------------
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
 
 # -------------------------------
 # 1. Load Model and Metadata
 # -------------------------------
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_freshguard_model():
-    return load_model(r"D:\Projects\FreshGuard\models\freshguard_model.h5")
+    model_path = r"D:\Projects\FreshGuard\models\freshguard_model.h5"
+    try:
+        model = load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_metadata():
-    with open(r"D:\Projects\FreshGuard\models\freshguard_metadata.pkl", "rb") as f:
-        return pickle.load(f)
+    metadata_path = r"D:\Projects\FreshGuard\models\freshguard_metadata.pkl"
+    try:
+        with open(metadata_path, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        st.error("Metadata file not found.")
+        return None
 
 model = load_freshguard_model()
 metadata = load_metadata()
+
+if model is None or metadata is None:
+    st.stop()
+
 int_to_label = metadata["int_to_label"]
 IMG_SIZE = (224, 224)
 
 # -------------------------------
 # 2. Preprocessing function
 # -------------------------------
-def preprocess_image(image):
+def preprocess_image(image: Image.Image) -> np.ndarray:
     img = image.resize(IMG_SIZE)
-    img_array = keras_image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0) / 255.0
+    img_array = np.array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
     return img_array
 
 # -------------------------------
 # 3. Prediction function
 # -------------------------------
-def predict(image):
+def predict(image: Image.Image):
     processed_img = preprocess_image(image)
     preds = model.predict(processed_img, verbose=0)
     pred_class = np.argmax(preds[0])
@@ -45,23 +68,18 @@ def predict(image):
 # 4. Streamlit UI
 # -------------------------------
 st.set_page_config(page_title="FreshGuard", page_icon="🍎", layout="centered")
-
 st.title("🍎 FreshGuard - Food Freshness Classifier")
-st.markdown("Upload an image of a fruit/vegetable to check its **freshness level**.")
+st.markdown("Upload an image of a fruit or vegetable to check its **freshness level**.")
 
 uploaded_file = st.file_uploader("📂 Upload an image...", type=["jpg", "jpeg", "png"])
-
 if uploaded_file is not None:
-    # Display uploaded image (smaller size)
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image.resize((300, 300)), caption="Uploaded Image", use_container_width=False)
-
-    # Predict with spinner
+    st.image(image.resize((300, 300)), caption="Uploaded Image", use_column_width=False)
+    
     with st.spinner("⏳ Analyzing..."):
         label, confidence = predict(image)
 
-    # Show styled result
-    st.success(f"### ✅ Prediction: **{label}** \nConfidence: **{confidence*100:.2f}%**")
+    st.success(f"### ✅ Prediction: **{label}**\nConfidence: **{confidence*100:.2f}%**")
 
 # -------------------------------
 # Sidebar (About section)
@@ -69,9 +87,8 @@ if uploaded_file is not None:
 st.sidebar.header("ℹ️ About FreshGuard")
 st.sidebar.write(
     """
-    FreshGuard helps you classify the **freshness level** of fruits & vegetables.  
-    - Upload an image 📸  
-    - Get an instant prediction ✅  
-    - Built with **Deep Learning (Keras + Streamlit)**  
-    """
+    FreshGuard helps you classify the **freshness level** of fruits & vegetables. 
+    - Upload an image 📸 
+    - Get an instant prediction ✅ 
+    - Built with **Deep Learning (Keras + Streamlit)** """
 )
