@@ -1,15 +1,47 @@
-# Virtual environment
-venv/
-.venv/
+# Ignore dataset folder
+data/
 
-# Python cache
+# Ignore common dataset formats
+*.zip
+*.tar
+*.tar.gz
+*.csv
+
+# Ignore image/video files (datasets)
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.mp4
+*.avi
+*.mov
+
+# Ignore Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore Python cache files
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Model & large files
-models/*.h5
-models/*.pkl
+# Ignore virtual environments
+.env/
+.venv/
+env/
+venv/
 
-# Streamlit cache
-.streamlit/
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore large ML artifacts
+*.h5
+*.ckpt
+*.pb
+*.tflite
+*.onnx
+
+# (Optional) If you want to keep only FINAL model:
+# !model.h5   # uncomment this if you want to push your trained model
