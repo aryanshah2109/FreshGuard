@@ -1,0 +1,15 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Model & large files
+models/*.h5
+models/*.pkl
+
+# Streamlit cache
+.streamlit/
