@@ -170,12 +170,6 @@ seaborn==0.12.2
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact & Support
-
-- **Project Maintainer**: [Your Name](mailto:your.email@example.com)
-- **GitHub Issues**: [Report bugs or request features](https://github.com/yourusername/freshguard/issues)
-- **Documentation**: [Wiki](https://github.com/yourusername/freshguard/wiki)
-
 ## 🙏 Acknowledgments
 
 - TensorFlow team for the excellent deep learning framework
